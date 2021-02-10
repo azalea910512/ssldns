@@ -775,7 +775,6 @@ sam
 sam
 </auth-user-pass>
 EOF152
-
 echo '<ca>' >> /var/www/openvpn/tcp.ovpn
 cat /etc/openvpn/ca.crt >> /var/www/openvpn/tcp.ovpn
 echo '</ca>' >> /var/www/openvpn/tcp.ovpn
@@ -788,98 +787,6 @@ echo '</key>' >> /var/www/openvpn/tcp.ovpn
 echo '<tls-auth>' >> /var/www/openvpn/tcp.ovpn
 cat /etc/openvpn/tls-auth.key >> /var/www/openvpn/tcp.ovpn
 echo '</tls-auth>' >> /var/www/openvpn/tcp.ovpn
-
-cat <<EOF16> /var/www/openvpn/udp.ovpn
-# Credits to GakodX
-client
-dev tun
-proto udp
-setenv FRIENDLY_NAME "I'M MASTA GAKOD"
-remote $IPADDR $OpenVPN_UDP_Port
-resolv-retry infinite
-route-method exe
-nobind
-persist-key
-persist-tun
-comp-lzo
-cipher AES-256-CBC
-auth SHA256
-push "redirect-gateway def1 bypass-dhcp"
-verb 3
-push-peer-info
-ping 10
-ping-restart 60
-hand-window 70
-server-poll-timeout 4
-reneg-sec 2592000
-sndbuf 0
-rcvbuf 0
-remote-cert-tls server
-key-direction 1
-<auth-user-pass>
-sam
-sam
-</auth-user-pass>
-EOF16
-<ca>
-$(cat /etc/openvpn/ca.crt)
-</ca>
-<cert>
-$(cat /etc/openvpn/client.crt)
-</cert>
-<key>
-$(cat /etc/openvpn/client.key)
-</key>
-<tls-auth>
-$(cat /etc/openvpn/tls-auth.key)
-</tls-auth>
-
-
-cat <<EOF17> /var/www/openvpn/ssl.ovpn
-client
-proto tcp-client
-dev tun
-setenv FRIENDLY_NAME "I'M MASTA GAKOD"
-remote 127.0.0.1 $OpenVPN_TCP_Port
-route $IPADDR 255.255.255.255 net_gateway 
-http-proxy-retry
-resolv-retry infinite
-route-method exe
-nobind
-persist-key
-persist-tun
-comp-lzo
-cipher AES-256-CBC
-auth SHA256
-push "redirect-gateway def1 bypass-dhcp"
-verb 3
-push-peer-info
-ping 10
-ping-restart 60
-hand-window 70
-server-poll-timeout 4
-reneg-sec 2592000
-sndbuf 0
-rcvbuf 0
-remote-cert-tls server
-key-direction 1
-<auth-user-pass>
-sam
-sam
-</auth-user-pass>
-EOF17
-<ca>
-$(cat /etc/openvpn/ca.crt)
-</ca>
-<cert>
-$(cat /etc/openvpn/client.crt)
-</cert>
-<key>
-$(cat /etc/openvpn/client.key)
-</key>
-<tls-auth>
-$(cat /etc/openvpn/tls-auth.key)
-</tls-auth>
 
 # Setting UFW
 apt-get install ufw
