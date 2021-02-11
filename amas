@@ -41,8 +41,8 @@ Stunnel_Port2='444' # through OpenSSH
 Stunnel_Port3='448' # through OpenVPN
 
 # OpenVPN Ports
-OpenVPN_Port1='1101'
-OpenVPN_Port2='1194' # take note when you change this port, openvpn sun noload config will not work
+# OpenVPN_Port1='1101'
+# OpenVPN_Port2='1194' # take note when you change this port, openvpn sun noload config will not work
 
 # Privoxy Ports (must be 1024 or higher)
 Privoxy_Port1='8118'
