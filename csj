@@ -25,7 +25,7 @@ Stunnel_Port1='443' # through Dropbear
 Stunnel_Port2='444' # through OpenSSH
 
 # OpenVPN Ports
-OpenVPN_TCP_Port='443'
+OpenVPN_TCP_Port='1103'
 OpenVPN_UDP_Port='27015'
 
 # Privoxy Ports
@@ -35,7 +35,7 @@ Privoxy_Port2='8086'
 # Squid Ports
 Squid_Port1='3128'
 Squid_Port2='8080'
-Squid_Port3='80'
+Squid_Port3='8888'
 
 # Install DDOS Deflate
 cd
@@ -238,6 +238,10 @@ connect = 127.0.0.1:dropbear_port_c
 [openssh]
 accept = Stunnel_Port2
 connect = 127.0.0.1:openssh_port_c
+
+[openvpn]
+accept = 990
+connect = 127.0.0.1:1103
 MyStunnelC
 
  # setting stunnel ports
@@ -302,24 +306,27 @@ ca /etc/openvpn/ca.crt
 cert /etc/openvpn/server.crt
 key /etc/openvpn/server.key
 dh /etc/openvpn/dh2048.pem
-tls-auth /etc/openvpn/ta.key 0
-server 10.9.0.0 255.255.255.0
-ifconfig-pool-persist ipp.txt
-push "redirect-gateway def1 bypass-dhcp"
-push "dhcp-option DNS 8.8.8.8"
-push "dhcp-option DNS 8.8.4.4"
-keepalive 1 12
-tls-auth ta.key 0
+crl-verify /etc/openvpn/crl.pem
+verify-client-cert none
+username-as-common-name
 key-direction 0
-cipher AES-128-CBC  
-auth SHA256
+plugin /etc/openvpn/plugins/openvpn-plugin-auth-pam.so login
+server 10.200.0.0 255.255.0.0
+ifconfig-pool-persist ipp.txt
+push "route-method exe"
+push "route-delay 2"
+keepalive 10 120
 comp-lzo
 user nobody
 group nogroup
 persist-key
 persist-tun
 status openvpn-status.log
-verb 3
+log tcp.log
+verb 2
+ncp-disable
+cipher none
+auth none
 myOpenVPNconf2
 
  cat <<'EOF7'> /etc/openvpn/ca.crt
@@ -795,7 +802,7 @@ myNginxC
 
  # Now creating all of our OpenVPN Configs 
 
-cat <<EOF15> /var/www/openvpn/gtmsnswnp.ovpn90
+cat <<EOF15> /var/www/openvpn/gtmsnswnp.ovpn
 # Thanks for using this script, Enjoy Highspeed OpenVPN Service
 client
 dev tun
@@ -822,15 +829,8 @@ redirect-gateway def1
 setenv CLIENT_CERT 0
 dhcp-option DNS 1.1.1.1
 dhcp-option DNS 1.0.0.1
-http-proxy $IPADDR $Privoxy_Port1
-http-proxy-option VERSION 1.1
-http-proxy-option CUSTOM-HEADER ""
-http-proxy-option CUSTOM-HEADER "GET https://storage.googleapis.com HTTP/1.1"
-http-proxy-option CUSTOM-HEADER Host storage.googleapis.com
-http-proxy-option CUSTOM-HEADER X-Forward-Host storage.googleapis.com
-http-proxy-option CUSTOM-HEADER X-Forwarded-For storage.googleapis.com
-http-proxy-option CUSTOM-HEADER Referrer storage.googleapis.com
-
+http-proxy $IPADDR $Squid_Port1
+http-proxy-retry
 <ca>
 $(cat /etc/openvpn/ca.crt)
 $(cat /etc/openvpn/server.crt)
@@ -839,7 +839,7 @@ $(cat /etc/openvpn/ta.key)
 </tls-auth>
 EOF15
 
-cat <<EOF16> /var/www/openvpn/sun-tutcp.ovpn
+cat <<EOF16> /var/www/openvpn/tcp.ovpn
 # Thanks for using this script, Enjoy Highspeed OpenVPN Service
 client
 dev tun
@@ -862,10 +862,7 @@ setenv CLIENT_CERT 0
 reneg-sec 0
 verb 1
 http-proxy $IPADDR $Squid_Port1
-http-proxy-option CUSTOM-HEADER Host www.viber.com.edgekey.net
-http-proxy-option CUSTOM-HEADER X-Online-Host www.viber.com.edgekey.net
-http-proxy-option CUSTOM-HEADER X-Forwarded-For www.viber.com.edgekey.net
-
+http-proxy-retry
 <ca>
 $(cat /etc/openvpn/ca.crt)
 $(cat /etc/openvpn/server.crt)
@@ -910,24 +907,28 @@ EOF162
 cat <<EOF17> /var/www/openvpn/udp.ovpn
 # Thanks for using this script, Enjoy Highspeed OpenVPN Service
 client
-keepalive 1 12
-user nobody
-group nogroup
-setenv FRIENDLY_NAME "Debian VPN WNP
-remote $IPADDR $OpenVPN_UDP_Port
-proto udp
 dev tun
-cipher AES-128-CBC
-auth SHA256
-key-direction 1
+proto udp
+setenv FRIENDLY_NAME "Debian VPN SUN"
+remote $IPADDR $OpenVPN_UDP_Port
+remote-cert-tls server
 resolv-retry infinite
+float
+fast-io
 nobind
 persist-key
+persist-remote-ip
 persist-tun
-ns-cert-type server
-tls-version-min 1.2
+auth-user-pass
+auth none
+auth-nocache
+cipher none
 comp-lzo
-verb 3
+redirect-gateway def1
+setenv CLIENT_CERT 0
+reneg-sec 0
+verb 1
+
 <ca>
 $(cat /etc/openvpn/ca.crt)
 $(cat /etc/openvpn/server.crt)
@@ -964,10 +965,8 @@ redirect-gateway def1
 setenv CLIENT_CERT 0
 dhcp-option DNS 1.1.1.1
 dhcp-option DNS 1.0.0.1
-http-proxy $IPADDR $Privoxy_Port1
-http-proxy-option VERSION 1.1
-http-proxy-option CUSTOM-HEADER Host www.googleapis.com
-http-proxy-option CUSTOM-HEADER X-Forwarded-For www.googleapis.com
+http-proxy $IPADDR $Squid_Port2
+http-proxy-retry
 
 <ca>
 $(cat /etc/openvpn/ca.crt)
@@ -1004,12 +1003,8 @@ redirect-gateway def1
 setenv CLIENT_CERT 0
 dhcp-option DNS 1.1.1.1
 dhcp-option DNS 1.0.0.1
-http-proxy $IPADDR $Privoxy_Port1
-http-proxy-option CUSTOM-HEADER CONNECT HTTP/1.0
-http-proxy-option CUSTOM-HEADER Host shopee.ph
-http-proxy-option CUSTOM-HEADER X-Online-Host shopee.ph
-http-proxy-option CUSTOM-HEADER X-Forward-Host shopee.ph
-http-proxy-option CUSTOM-HEADER Connection Keep-Alive
+http-proxy $IPADDR $Squid_Port1
+http-proxy-retry
 
 <ca>
 $(cat /etc/openvpn/ca.crt)
@@ -1046,10 +1041,8 @@ redirect-gateway def1
 setenv CLIENT_CERT 0
 dhcp-option DNS 1.1.1.1
 dhcp-option DNS 1.0.0.1
-http-proxy $IPADDR 3356
-http-proxy-option CUSTOM-HEADER ""
-http-proxy-option CUSTOM-HEADER "POST https://viber.com HTTP/1.1"
-http-proxy-option CUSTOM-HEADER "X-Forwarded-For: viber.com"
+http-proxy $IPADDR $Squid_Port1
+http-proxy-retry
 
 <ca>
 $(cat /etc/openvpn/ca.crt)
