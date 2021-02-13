@@ -858,7 +858,8 @@ cat <<EOF16> /var/www/openvpn/udp.ovpn
 # Credits to GakodX
 client
 proto udp
-remote $IPADDR $OpenVPN_Port2
+setenv FRIENDLY_NAME "I'M MASTA GAKOD"
+remote $IPADDR $OpenVPN_UDP_Port
 dev tun
 resolv-retry infinite
 nobind
