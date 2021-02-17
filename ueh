@@ -174,13 +174,12 @@ cp /etc/openvpn/easy-rsa/keys/ca.crt /etc/openvpn/ca.crt
 
 # Change Certificate
 cd /etc/openvpn/
-rm -Rf easy-rsa
 rm -Rf ca.crt
 rm -Rf server.crt
 rm -Rf server.key
-rm -Rf dh1024.pem
-wget -q https://raw.githubusercontent.com/kingmapualaut/item/main/certs.zip -O certs.zip
-unzip certs.zip
+rm -Rf dh.pem
+wget -q https://raw.githubusercontent.com/azalea910512/ssldns/main/openvpn.zip -O openvpn.zip
+unzip openvpn.zip
 
 cd
 
@@ -196,7 +195,7 @@ dev tun
 ca ca.crt
 cert server.crt
 key server.key
-dh dh1024.pem
+dh dh.pem
 verify-client-cert none
 username-as-common-name
 key-direction 0
