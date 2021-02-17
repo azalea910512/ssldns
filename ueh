@@ -89,8 +89,13 @@ apt-get -y install nano iptables-persistent dnsutils screen whois ngrep unzip un
 echo "
 INSTALLER PROCESS PLEASE WAIT
 
+
+
 TAKE TIME 5-10 MINUTE
 "
+apt-get update -y
+apt-get install openvpn -y
+
 # script
 wget -O /usr/local/bin/menu "https://raw.githubusercontent.com/ara-rangers/vps/master/menu"
 wget -O /usr/local/bin/m "https://raw.githubusercontent.com/ara-rangers/vps/master/menu"
@@ -279,11 +284,23 @@ nice -20
 reneg-sec 0
 dhcp-option DNS 1.1.1.1
 dhcp-option DNS 1.0.0.1
-
+<auth-user-pass>
+sam
+sam
+</auth-user-pass>
+<ca>
+$(cat /etc/openvpn/ca.crt)
+</ca>
+<cert>
+$(cat /etc/openvpn/server.crt)
+</cert>
+<key>
+$(cat /etc/openvpn/server.key)
+</key>
+<tls-auth>
+$(cat /etc/openvpn/ta.key)
+</tls-auth>
 END
-echo '<ca>' >> /home/vps/public_html/noload.ovpn
-cat /etc/openvpn/ca.crt >> /home/vps/public_html/noload.ovpn
-echo '</ca>' >> /home/vps/public_html/noload.ovpn
 
 cat > /home/vps/public_html/fixplan.ovpn <<-END
 # Gakod Script
