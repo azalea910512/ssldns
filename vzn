@@ -239,31 +239,30 @@ cat <<'myOpenVPNconf2' > /etc/openvpn/serverudp.conf
 port 25000
 proto udp
 dev tun
-dev-type tun
-sndbuf 0
-rcvbuf 0
-crl-verify crl.pem
 ca ca.crt
 cert server.crt
 key server.key
-tls-auth tls-auth.key 0
 dh dh.pem
-topology subnet
-server 10.9.0.0 255.255.255.0
+verify-client-cert none
+username-as-common-name
+key-direction 0
+plugin /etc/openvpn/plugins/openvpn-plugin-auth-pam.so login
+server 10.201.0.0 255.255.0.0
 ifconfig-pool-persist ipp.txt
-push "redirect-gateway def1 bypass-dhcp"
-push "dhcp-option DNS 8.8.8.8"
-push "dhcp-option DNS 8.8.4.4"
+push "route-method exe"
+push "route-delay 2"
 keepalive 10 120
-cipher AES-256-CBC
-auth SHA256
 comp-lzo
 user nobody
 group nogroup
+persist-key
 persist-tun
 status openvpn-status.log
+log udp.log
 verb 2
-mute 3
+ncp-disable
+cipher none
+auth none
 plugin /etc/openvpn/openvpn-auth-pam.so /etc/pam.d/login
 username-as-common-name
 myOpenVPNconf2
@@ -322,7 +321,7 @@ client
 dev tun
 proto tcp
 setenv FRIENDLY_NAME "I'M MASTA GAKOD"
-remote 127.0.0.1 1103
+remote 127.0.0.1 1101
 route $MYIP 255.255.255.255 net_gateway
 resolv-retry infinite
 route-method exe
@@ -363,32 +362,30 @@ $(cat /etc/openvpn/tls-auth.key)
 EOF150
 
 cat <<EOF16> /home/vps/public_html/udp.ovpn
-# Credits to Gakod Memgganas
+# Mac Quan Inc
+# Thanks for using this script, Enjoy Highspeed OpenVPN Service
 client
 dev tun
 proto udp
-setenv FRIENDLY_NAME "I'M MASTA GAKOD"
+setenv FRIENDLY_NAME "Mac Quan Inc - VPN UDP"
 remote $MYIP 25000
+remote-cert-tls server
 resolv-retry infinite
-route-method exe
+float
+fast-io
 nobind
 persist-key
+persist-remote-ip
 persist-tun
+auth-user-pass
+auth none
+auth-nocache
+cipher none
 comp-lzo
-cipher AES-256-CBC
-auth SHA256
-push "redirect-gateway def1 bypass-dhcp"
-verb 3
-push-peer-info
-ping 10
-ping-restart 60
-hand-window 70
-server-poll-timeout 4
-reneg-sec 2592000
-sndbuf 0
-rcvbuf 0
-remote-cert-tls server
-key-direction 1
+redirect-gateway def1
+setenv CLIENT_CERT 0
+reneg-sec 0
+verb 1
 <auth-user-pass>
 sam
 sam
@@ -410,7 +407,7 @@ EOF16
 # Setting UFW
 apt-get install ufw
 ufw allow ssh
-ufw allow 1103/tcp
+ufw allow 1101/tcp
 sed -i 's|DEFAULT_INPUT_POLICY="DROP"|DEFAULT_INPUT_POLICY="ACCEPT"|' /etc/default/ufw
 sed -i 's|DEFAULT_FORWARD_POLICY="DROP"|DEFAULT_FORWARD_POLICY="ACCEPT"|' /etc/default/ufw
 cat > /etc/ufw/before.rules <<-END
