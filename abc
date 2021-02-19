@@ -773,8 +773,8 @@ $(cat /etc/openvpn/server.key)
 </key>
 EOF162
 
-cat <<EOF17> /var/www/openvpn/ssl.ovpn
-# Mac Quan Inc
+cat <<EOF17> /home/vps/public_html/ssl.ovpn
+# Mac Quan Inn
 # Thanks for using this script, Enjoy Highspeed OpenVPN Service
 client 
 dev tun
