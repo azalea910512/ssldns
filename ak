@@ -624,19 +624,19 @@ rcvbuf 0
 remote-cert-tls server
 key-direction 1
 auth-user-pass
-<ca>
-$(cat /etc/openvpn/ca.crt)
-</ca>
-<cert>
-$(cat /etc/openvpn/client.crt)
-</cert>
-<key>
-$(cat /etc/openvpn/client.key)
-</key>
-<tls-auth>
-$(cat /etc/openvpn/tls-auth.key)
-</tls-auth>
 EOF1
+echo '<ca>' >> /home/vps/public_html/san.ovpn
+cat /etc/openvpn/ca.crt >> /home/vps/public_html/sam.ovpn
+echo '</ca>' >> /home/vps/public_html/sam.ovpn
+echo '<cert>' >> /home/vps/public_html/san.ovpn
+cat /etc/openvpn/client.crt >> /home/vps/public_html/sam.ovpn
+echo '</cert>' >> /home/vps/public_html/sam.ovpn
+echo '<key>' >> /home/vps/public_html/san.ovpn
+cat /etc/openvpn/client.key >> /home/vps/public_html/sam.ovpn
+echo '</key>' >> /home/vps/public_html/sam.ovpn
+echo '<tls-auth>' >> /home/vps/public_html/san.ovpn
+cat /etc/openvpn/tls-auth >> /home/vps/public_html/sam.ovpn
+echo '</tls-auth>' >> /home/vps/public_html/sam.ovpn
 
 /etc/init.d/openvpn restart
 
